@@ -28,3 +28,19 @@ Bài 1
 
 1.4 kết quả chạy code
 ![1.4](kq/bt1.png)
+
+Bài 2
+![2](kq/bt2.png)
+
+Bài 3
+Test: curl 'localhost:5000/orders?status=paid'
+![3.1](kq/bt3_1.png)
+
+Test: curl 'localhost:5000/orders?limit=5'
+![3.2](kq/bt3_2.png)
+
+Test: curl 'localhost:5000/orders?fields=id,total'
+![3.3](kq/bt3_3.png)
+
+Test: lỗi 400 Bad Request
+![3.3](kq/bt3_4.png)
