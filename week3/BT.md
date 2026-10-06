@@ -5,14 +5,14 @@ Review API "https://pokeapi.co/api/v2/" theo 9 tiêu chí:
 
     Vd:
 
-    ![vd1](<Screenshot 2026-10-06 193335.png>)
+    ![vd1](vd/vd1.png)
 2. Naming lowercase, kebab-case path, snake_case query.
 
     Đạt yêu cầu
 
     Vd:
 
-    ![vd2](<Screenshot 2026-10-06 193715.png>)
+    ![vd2](vd/vd2.png)
 
 3. Endpoint depth ≤ 3; flatten với filter khi sâu hơn.
 
@@ -30,7 +30,7 @@ Review API "https://pokeapi.co/api/v2/" theo 9 tiêu chí:
 
     Vd:
 
-    ![vd5](<Screenshot 2026-10-06 194522.png>)
+    ![vd5](vd/vd5.png)
 
 6. Error response theo RFC 7807 problem+json nhất quán.
 
@@ -44,7 +44,7 @@ Review API "https://pokeapi.co/api/v2/" theo 9 tiêu chí:
 
     Vd:
 
-    ![vd7](<Screenshot 2026-10-06 195204.png>)
+    ![vd7](vd/vd7.png)
 
 8. Hỗ trợ filter, sort, sparse fieldsets cho mọi collection.
 
