@@ -1,0 +1,226 @@
+openapi: 3.0.3
+info:
+  title: Tasks API
+  version: 1.0.0
+  description: Quản lý task nội bộ
+
+servers:
+  - url: http://localhost:5000/v1
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: tasks
+
+paths:
+  /tasks:
+    get:
+      tags:
+        - tasks
+      operationId: listTasks
+      parameters:
+        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/StatusFilter'
+      responses:
+        '200':
+          $ref: '#/components/responses/TaskPageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - tasks
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/TaskCreatedResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /tasks/{taskId}:
+    parameters:
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags:
+        - tasks
+      operationId: getTaskById
+      responses:
+        '200':
+          $ref: '#/components/responses/TaskResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags:
+        - tasks
+      operationId: patchTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/TaskResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - tasks
+      operationId: deleteTask
+      responses:
+        '204':
+          description: No Content
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PageLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 10
+    StatusFilter:
+      name: status
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [open, done]
+
+  schemas:
+    Task:
+      type: object
+      required:
+        - id
+        - title
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "c9bf9e57-1685-4c89-bafb-ff5af830be8a"
+        title:
+          type: string
+          example: "Họp nhóm API team"
+        status:
+          type: string
+          enum: [open, done]
+          example: "open"
+        priority:
+          type: string
+          enum: [low, normal, high]
+          example: "high"
+        dueDate:
+          type: string
+          format: date
+          example: "2026-09-15"
+        assigneeId:
+          type: string
+          example: "user-123"
+
+    TaskPage:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        total:
+          type: integer
+          example: 1
+        page:
+          type: integer
+          example: 1
+
+    CreateTaskInput:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: "Họp nhóm API team"
+        priority:
+          type: string
+          enum: [low, normal, high]
+          default: "normal"
+        dueDate:
+          type: string
+          format: date
+          example: "2026-09-15"
+        assigneeId:
+          type: string
+          example: "user-123"
+
+    UpdateTaskInput:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: string
+          enum: [open, done]
+        priority:
+          type: string
+          enum: [low, normal, high]
+        dueDate:
+          type: string
+          format: date
+        assigneeId:
+          type: string
+
+  responses:
+    TaskResponse:
+      description: Thành công
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Task'
+
+    TaskCreatedResponse:
+      description: Tạo thành công
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Task'
+
+    TaskPageResponse:
+      description: Danh sách task
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TaskPage'
+
+    Unauthorized:
+      description: Chưa xác thực token (401 Unauthorized)
+
+    NotFound:
+      description: Không tìm thấy tài nguyên (404 Not Found)
+
+    ValidationError:
+      description: Dữ liệu đầu vào không hợp lệ (422 Unprocessable Entity)

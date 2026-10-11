@@ -1,0 +1,255 @@
+openapi: 3.0.3
+info:
+  title: Swagger Petstore API
+  description: API quản lý cửa hàng thú cưng hỗ trợ CRUD (List, Get, Create, Patch, Delete).
+  version: 1.0.0
+  contact:
+    name: Petstore Support
+    email: support@petstore.com
+
+servers:
+  - url: https://petstore.example.com/v1
+    description: Production Server
+  - url: https://staging.petstore.example.com/v1
+    description: Staging Server
+
+paths:
+  /pets:
+    get:
+      summary: Danh sách thú cưng (List)
+      operationId: listPets
+      tags:
+        - Pets
+      parameters:
+        - name: limit
+          in: query
+          description: Số lượng bản ghi tối đa trả về
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          description: Lọc theo trạng thái của thú cưng
+          required: false
+          schema:
+            type: string
+            enum: [available, pending, sold]
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Thêm thú cưng mới (Create)
+      operationId: createPet
+      tags:
+        - Pets
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetCreateInput'
+      responses:
+        '201':
+          description: Tạo thú cưng thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          description: Dữ liệu đầu vào không hợp lệ
+        '401':
+          description: Chưa xác thực Token/API Key
+
+  /pets/{petId}:
+    get:
+      summary: Lấy chi tiết thú cưng theo ID (Get)
+      operationId: getPetById
+      tags:
+        - Pets
+      parameters:
+        - name: petId
+          in: path
+          description: ID của thú cưng cần truy vấn
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    patch:
+      summary: Cập nhật một phần thông tin thú cưng (Patch)
+      operationId: patchPet
+      tags:
+        - Pets
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: petId
+          in: path
+          description: ID của thú cưng cần cập nhật
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetUpdateInput'
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          description: Dữ liệu gửi lên không hợp lệ
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      summary: Xóa thú cưng theo ID (Delete)
+      operationId: deletePet
+      tags:
+        - Pets
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: petId
+          in: path
+          description: ID của thú cưng cần xóa
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Xóa thành công (không trả về nội dung)
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+components:
+  schemas:
+    # Schema đầy đủ của đối tượng Pet khi trả về
+    Pet:
+      type: object
+      required:
+        - id
+        - name
+        - status
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Miu Miu"
+        tag:
+          type: string
+          example: "Mèo Anh lông ngắn"
+        price:
+          type: number
+          format: float
+          example: 250.00
+        status:
+          type: string
+          enum: [available, pending, sold]
+          example: "available"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-10-07T10:00:00Z"
+
+    # Schema dùng cho API Create (POST) - không cần gửi field `id` hay `createdAt`
+    PetCreateInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "Miu Miu"
+        tag:
+          type: string
+          example: "Mèo Anh lông ngắn"
+        price:
+          type: number
+          format: float
+          example: 250.00
+        status:
+          type: string
+          enum: [available, pending, sold]
+          default: "available"
+
+    # Schema dùng cho API Patch (PATCH) - tất cả các thuộc tính đều là Optional
+    PetUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Miu Miu - Đã đổi tên"
+        tag:
+          type: string
+          example: "Mèo Anh"
+        price:
+          type: number
+          format: float
+          example: 200.00
+        status:
+          type: string
+          enum: [available, pending, sold]
+          example: "sold"
+
+  responses:
+    NotFoundError:
+      description: Không tìm thấy tài nguyên (Not Found)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 404
+              message:
+                type: string
+                example: "Pet not found"
+
+    InternalError:
+      description: Lỗi hệ thống nội bộ (Internal Server Error)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 500
+              message:
+                type: string
+                example: "Internal server error"
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
