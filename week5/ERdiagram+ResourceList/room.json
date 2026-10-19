@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Room",
+  "type": "object",
+  "properties": {
+    "id": { "type": "integer" },
+    "hotel_id": { "type": "integer" },
+    "room_number": { "type": "string" }
+  },
+  "required": ["id", "hotel_id", "room_number"]
+}
