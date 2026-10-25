@@ -1,0 +1,180 @@
+openapi: 3.0.3
+info:
+  title: Social Network Auth & Post API
+  version: 1.0.0
+  description: OpenAPI Specification cho bài tập Buổi 6 - Authentication & Authorization.
+
+servers:
+  - url: https://api.socialnetwork.test/v1
+    description: Sandbox/Local Environment
+
+paths:
+  /auth/login:
+    post:
+      summary: Đăng nhập cấp access và refresh token
+      operationId: loginUser
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: P@ssw0rd123
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1Ni...
+                  refresh_token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1Ni...
+                  token_type:
+                    type: string
+                    example: Bearer
+                  expires_in:
+                    type: integer
+                    example: 900
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          description: Quá nhiều lần thử đăng nhập không thành công (Rate Limit)
+
+  /auth/refresh:
+    post:
+      summary: Cấp lại access token từ refresh token
+      operationId: refreshToken
+      tags:
+        - Authentication
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Cấp mới access token thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1Ni...
+                  expires_in:
+                    type: integer
+                    example: 900
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /posts/{id}:
+    get:
+      summary: Lấy chi tiết bài đăng theo ID
+      operationId: getPostById
+      tags:
+        - Posts
+      security:
+        - BearerAuth:
+            - "posts:read"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID của bài viết
+          schema:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Lấy thông tin bài đăng thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  author_id:
+                    type: string
+                  content:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - title
+      properties:
+        status:
+          type: integer
+          example: 401
+        title:
+          type: string
+          example: "Unauthorized"
+        detail:
+          type: string
+          example: "Token không hợp lệ hoặc đã hết hạn"
+
+  responses:
+    BadRequest:
+      description: Dữ liệu gửi lên không hợp lệ
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Thiếu thông tin xác thực hoặc token không hợp lệ / hết hạn
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Không đủ quyền hạn (nguồn tài nguyên / scope không đủ)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Bài đăng không tồn tại hoặc người dùng không có quyền truy cập
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
