@@ -1,0 +1,97 @@
+openapi: 3.0.3
+info:
+  title: Product API
+  version: 1.0.0
+
+paths:
+  /api/v1/products:
+    get:
+      summary: Lấy danh sách sản phẩm
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Tạo mới sản phẩm
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductIn'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Validation Error
+        '409':
+          description: SKU Conflict
+
+  /api/v1/products/{id}:
+    get:
+      summary: Chi tiết sản phẩm
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+    delete:
+      summary: Xóa sản phẩm (Soft Delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+
+  /api/v1/products/{id}/reserve:
+    post:
+      summary: Đặt trước số lượng sản phẩm
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [qty]
+              properties:
+                qty:
+                  type: integer
+                  minimum: 1
+      responses:
+        '200':
+          description: OK
+        '409':
+          description: Out of Stock
+
+components:
+  schemas:
+    ProductIn:
+      type: object
+      required: [sku, name, price_cents]
+      properties:
+        sku:
+          type: string
+        name:
+          type: string
+        price_cents:
+          type: integer
+          minimum: 0
+        qty_in_stock:
+          type: integer
+          minimum: 0
+          default: 0

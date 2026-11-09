@@ -1,0 +1,19 @@
+openapi: 3.0.3
+info:
+  title: Product API (Design-First)
+  version: 1.0.0
+servers:
+  - url: /
+
+paths:
+  /products:
+    get:
+      summary: Lấy danh sách sản phẩm
+      responses:
+        '200':
+          description: Thành công
+    post:
+      summary: Tạo sản phẩm mới
+      responses:
+        '201':
+          description: Tạo thành công
