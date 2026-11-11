@@ -1,10 +1,10 @@
 from flask import Flask
-from product_api.config import DefaultConfig
-from product_api.extensions import db, migrate
-from product_api.errors import register_error_handlers
-from product_api.api.products import products_bp
-from product_api.health import health_bp
-from product_api.api.orders import orders_bp
+from src.product_api.config import DefaultConfig
+from src.product_api.extensions import db, migrate
+from src.product_api.errors import register_error_handlers
+from src.product_api.api.products import products_bp
+from src.product_api.health import health_bp
+from src.product_api.api.orders import orders_bp
 
 def create_app(config=None):
     app = Flask(__name__)

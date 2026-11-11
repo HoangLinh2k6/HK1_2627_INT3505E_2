@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 from sqlalchemy import String, Integer, DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from product_api.extensions import db
+from src.product_api.extensions import db
 
 class Order(db.Model):
     __tablename__ = "orders"

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from sqlalchemy import String, Integer, Boolean, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
-from product_api.extensions import db
+from src.product_api.extensions import db
 
 class Product(db.Model):
     __tablename__ = "products"

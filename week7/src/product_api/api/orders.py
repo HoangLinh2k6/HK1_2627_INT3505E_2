@@ -1,10 +1,10 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import selectinload
-from product_api.extensions import db
-from product_api.models.order import Order, OrderItem
-from product_api.models.product import Product
-from product_api.errors import NotFound, OutOfStock
-from product_api.api.schemas import OrderIn, OrderOut
+from src.product_api.extensions import db
+from src.product_api.models.order import Order, OrderItem
+from src.product_api.models.product import Product
+from src.product_api.errors import NotFound, OutOfStock
+from src.product_api.api.schemas import OrderIn, OrderOut
 
 orders_bp = Blueprint("orders", __name__, url_prefix="/api/v1/orders")
 
