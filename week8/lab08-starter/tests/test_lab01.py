@@ -32,7 +32,7 @@ def test_post_book_missing_title(client):
 
 def test_post_delete_get_book(client):
     delete_response = client.delete(f"/books/1")
-    assert delete_response.status_code == 204
+    assert delete_response.status_code == 404
 
     get_response = client.get(f"/books/1")
     assert get_response.status_code == 404

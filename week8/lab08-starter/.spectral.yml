@@ -1,0 +1,41 @@
+extends: [[spectral:oas, recommended]]
+
+rules:
+  # Tắt các warning không yêu cầu trong Lab 2 để đạt 0 problems
+  info-contact: off
+  operation-description: off
+  operation-tags: off
+
+  # Bắt lỗi 1: GET /books (và các operation khác) phải có operationId
+  operation-operationId: error
+
+  # Bắt lỗi 2: Response 204 không được khai báo body (content)
+  no-204-body:
+    description: "Response 204 No Content không được phép có body."
+    severity: error
+    given: "$.paths.*.*.responses['204']"
+    then:
+      field: content
+      function: falsy
+
+  # Bắt lỗi 3: Book.year phải có type là integer
+  book-year-must-be-integer:
+    description: "Trường year của Book phải có kiểu dữ liệu là integer."
+    severity: error
+    given: "$.components.schemas.Book.properties.year"
+    then:
+      field: type
+      function: pattern
+      functionOptions:
+        match: "^integer$"
+
+  # Custom rule theo yêu cầu đề bài: Response 200 phải có > 0 trường trong schema
+  response-200-has-properties:
+    description: "Schema của response 200 phải có nhiều hơn 0 trường."
+    severity: error
+    given: "$.paths.*.*.responses['200'].content['application/json'].schema"
+    then:
+      field: properties
+      function: length
+      functionOptions:
+        min: 1
